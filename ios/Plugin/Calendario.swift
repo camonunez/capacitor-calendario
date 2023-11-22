@@ -17,18 +17,21 @@ import EventKit
         // Usar EventKit para crear el evento
         // https://developer.apple.com/documentation/eventkit/ekeventstore
 
-        var eventStore = EKEventStore()
+        let eventStore = EKEventStore()
 
+        var resultado = false
         eventStore.requestAccess(to: .event) { (granted, error) in
             print("granted \(granted)")
-            print("error \(error)")
+            print("error \(String(describing: error))")
             if (!granted) {
-                call.reject([error: "sinPermiso"])
-            }
-            else if (error != nil) {
-                call.reject([error: "error"])
-            }
-            else {
+                // call.reject([error: "sinPermiso"])
+                print("sinPermiso")
+                resultado = false
+            } else if (error != nil) {
+                // call.reject([error: "error"])
+                print("error")
+                resultado = false
+            } else {
                 let event = EKEvent(eventStore: eventStore)
                 event.title = titulo
                 event.startDate = Date(timeIntervalSince1970: unixInicio)
@@ -40,14 +43,17 @@ import EventKit
                 do {
                     try eventStore.save(event, span: .thisEvent)
                     print("Evento guardado", event)
-                    call.resolve([
-                        "resultado": true
-                    ])
+                    // call.resolve([
+                    //     "resultado": true
+                    // ])
+                    resultado = true
                 } catch let error as NSError {
-                    print("falló el guardado del evento con el error : \(error)")
-                    call.reject([error: "guardadoFallido"])
+                    print("guardadoFallido error : \(error)")
+                    // call.reject([error: "guardadoFallido"])
+                    resultado = false
                 }
             }
         }
+        return resultado
     }
 }

@@ -20,5 +20,12 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSPrincipalClass</key>
 	<string></string>
+
+	<key>NSCalendarsUsageDescription</key>
+	<string>La aplicación necesita acceder al calendario para agregar eventos.</string>
+	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
+	<string>La aplicación necesita acceder al calendario para agregar eventos.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>La aplicación necesita acceder al calendario para agregar contactos a eventos.</string>
 </dict>
 </plist>

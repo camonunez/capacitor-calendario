@@ -1,5 +1,8 @@
 package cl.pow.capacitor.calendario;
 
+import android.content.Intent;
+import android.provider.CalendarContract;
+
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -32,11 +35,29 @@ public class CalendarioPlugin extends Plugin {
         Long unixFin = call.getLong("unixFin");
 
         // Utilizar android Intent para insertar el evento en el calendario
-        // https://developer.android.com/guide/components/intents-common#AddEvent
+        Intent intent = new Intent(Intent.ACTION_INSERT)
+            .setData(CalendarContract.Events.CONTENT_URI)
+            .putExtra(CalendarContract.Events.TITLE, titulo)
+            .putExtra(CalendarContract.Events.DESCRIPTION, descripcion)
+            .putExtra(CalendarContract.Events.EVENT_LOCATION, ubicacion)
+            .putExtra(CalendarContract.Events.ALL_DAY, todoElDia);
+
+        if (unixInicio != null) {
+            intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, unixInicio);
+        }
+        if (unixFin != null) {
+            intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, unixFin);
+        }
+
+        Boolean resultado = false;
+        if (getActivity() != null) {
+            getActivity().startActivity(intent);
+            resultado = true;
+        }
 
         // Retornar un JSObject con el resultado
         JSObject ret = new JSObject();
-        ret.put("resultado", implementation.crearEvento(titulo, descripcion, ubicacion, todoElDia, unixInicio, unixFin));
+        ret.put("resultado", resultado);
         call.resolve(ret);
     }
 }
