@@ -15,4 +15,19 @@ public class CalendarioPlugin: CAPPlugin {
             "value": implementation.echo(value)
         ])
     }
+
+    @objc func crearEvento(_ call: CAPPluginCall) {
+        let titulo = call.getString("titulo") ?? ""
+        let descripcion = call.getString("descripcion") ?? ""
+        let unixInicio = call.getDouble("unixInicio") ?? 0
+        let unixFin = call.getDouble("unixFin") ?? 0
+        let ubicacion = call.getString("ubicacion") ?? ""
+
+        let resultado = implementation.crearEvento(titulo: titulo, descripcion: descripcion, unixInicio: unixInicio, unixFin: unixFin, ubicacion: ubicacion)
+        
+        call.resolve([
+            "resultado": resultado
+        ])
+
+    }
 }

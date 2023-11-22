@@ -14,6 +14,8 @@ npx cap sync
 <docgen-index>
 
 * [`echo(...)`](#echo)
+* [`crearEvento(...)`](#crearevento)
+* [Interfaces](#interfaces)
 
 </docgen-index>
 
@@ -33,5 +35,34 @@ echo(options: { value: string; }) => Promise<{ value: string; }>
 **Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
 
 --------------------
+
+
+### crearEvento(...)
+
+```typescript
+crearEvento(evento: Evento) => Promise<{ value: boolean; }>
+```
+
+| Param        | Type                                      |
+| ------------ | ----------------------------------------- |
+| **`evento`** | <code><a href="#evento">Evento</a></code> |
+
+**Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
+
+--------------------
+
+
+### Interfaces
+
+
+#### Evento
+
+| Prop              | Type                |
+| ----------------- | ------------------- |
+| **`titulo`**      | <code>string</code> |
+| **`unixInicio`**  | <code>number</code> |
+| **`unixFin`**     | <code>number</code> |
+| **`ubicacion`**   | <code>string</code> |
+| **`descripcion`** | <code>string</code> |
 
 </docgen-api>
