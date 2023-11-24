@@ -44,37 +44,26 @@ public class CalendarioPlugin extends Plugin {
 		Integer unixInicio = call.getInt("unixInicio");
 		Integer unixFin = call.getInt("unixFin");
 
-		String ubicacion = call.getString("ubicacion");
+		String lugar = call.getString("lugar");
+		String direccion = call.getString("direccion");
 		String timezone = call.getString("timezone", "");
 
 		Intent intent = new Intent(Intent.ACTION_INSERT)
 			.setData(CalendarContract.Events.CONTENT_URI)
 			.putExtra(CalendarContract.Events.TITLE, titulo)
 			.putExtra(CalendarContract.Events.DESCRIPTION, descripcion)
-			.putExtra(CalendarContract.Events.EVENT_LOCATION, ubicacion)
+			.putExtra(CalendarContract.Events.EVENT_LOCATION, lugar + " - " + direccion)
 			.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, (unixInicio.longValue() * 1000))
 			.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, (unixFin.longValue() * 1000));
-
-		// Mostrar intent en consola
-		Log.d("cE intent.toString()", intent.toString());
 
 		if (!timezone.isEmpty()) {
 			intent.putExtra(CalendarContract.Events.EVENT_TIMEZONE, timezone);
 		}
-
-		Log.d("crearEvento", "startActivityForResult");
-		startActivityForResult(call, intent, "resultadoEventoEnCalendario");
 	}
 
 	// Método para manejar el resultado de la actividad (por ejemplo, cuando el usuario cierra la actividad de calendario)
 	@ActivityCallback
 	private void resultadoEventoEnCalendario(PluginCall call, ActivityResult result) {
-		// Mostrar data en consola
-		System.out.println("resultadoEventoEnCalendario result.toString()" + result.toString());
-
-		// Mostrar intent en consola
-		Log.d("cE result.toString()", result.toString());
-		Log.d("cE r.getResultCode()", String.valueOf(result.getResultCode()));
 
 		JSObject ret = new JSObject();
 
@@ -86,7 +75,7 @@ public class CalendarioPlugin extends Plugin {
 			ret.put("resultado", "cancelado");
 			notifyListeners("creacionEventoCancelada", ret); // Puedes usar cualquier evento que hayas definido en tu JavaScript
 		}
-		
+
 		// Si el resultCode es igual a Activity.RESULT_OK, entonces el usuario creó el evento
 		if (result.getResultCode() == Activity.RESULT_OK) {
 			Toast.makeText(getContext(), "Evento creado con éxito", Toast.LENGTH_SHORT).show();

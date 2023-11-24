@@ -22,7 +22,8 @@ public class CalendarioPlugin: CAPPlugin, EKEventEditViewDelegate {
             let descripcion = call.getString("descripcion") ?? ""
             let unixInicio = call.getDouble("unixInicio") ?? 0
             let unixFin = call.getDouble("unixFin") ?? 0
-            let ubicacion = call.getString("ubicacion") ?? ""
+            let lugar = call.getString("lugar") ?? ""
+            let direccion = call.getString("direccion") ?? ""
             let timezone = call.getString("timezone") ?? ""
 
             let eventStore = EKEventStore()
@@ -35,7 +36,7 @@ public class CalendarioPlugin: CAPPlugin, EKEventEditViewDelegate {
                 evento.timeZone = TimeZone(identifier: timezone)
             }
             evento.notes = descripcion
-            evento.location = ubicacion
+            evento.location = lugar + " - " + direccion
             evento.calendar = eventStore.defaultCalendarForNewEvents
 
             // Create a view controller
