@@ -1,7 +1,6 @@
+export type Resultado = 'creado' | 'cancelado' | 'error';
 export interface CalendarioPlugin {
-  echo(options: { value: string }): Promise<{ value: string }>;
-
-  crearEvento(evento: Evento): Promise<{ value: boolean }>;
+  crearEvento(evento: Evento): Promise<{ resultado: Resultado }>;
 }
 
 export interface Evento {
@@ -9,6 +8,7 @@ export interface Evento {
   unixInicio: number;
   unixFin: number;
 
+  timezone?: string;
   ubicacion?: string;
   descripcion?: string;
 }
