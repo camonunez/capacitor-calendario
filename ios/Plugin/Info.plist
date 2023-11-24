@@ -23,7 +23,7 @@
 
 	<key>NSCalendarsUsageDescription</key>
 	<string>La aplicación necesita acceder al calendario para agregar eventos.</string>
-	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
+	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>La aplicación necesita acceder al calendario para agregar eventos.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>La aplicación necesita acceder al calendario para agregar contactos a eventos.</string>
