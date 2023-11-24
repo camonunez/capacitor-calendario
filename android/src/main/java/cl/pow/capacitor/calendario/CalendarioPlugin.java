@@ -1,7 +1,10 @@
 package cl.pow.capacitor.calendario;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.provider.CalendarContract;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -9,55 +12,69 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
+import java.util.Calendar;
+
 @CapacitorPlugin(name = "Calendario")
 public class CalendarioPlugin extends Plugin {
 
-    private Calendario implementation = new Calendario();
+	@PluginMethod
+		public void crearEvento(PluginCall call) {
+		String titulo = call.getString("titulo");
+		String descripcion = call.getString("descripcion");
 
-    @PluginMethod
-    public void echo(PluginCall call) {
-        String value = call.getString("value");
+		if (!call.getData().has("unixInicio")) {
+			call.reject("Se debe proveer unixInicio");
+			return;
+		}
+		if (!call.getData().has("unixFin")) {
+			call.reject("Se debe proveer unixFin");
+			return;
+		}
+		Integer unixInicio = call.getInt("unixInicio");
+		Integer unixFin = call.getInt("unixFin");
 
-        JSObject ret = new JSObject();
-        ret.put("value", implementation.echo(value));
-        call.resolve(ret);
-    }
+		String ubicacion = call.getString("ubicacion");
+		String timezone = call.getString("timezone", "");
 
-    @PluginMethod
-    public void crearEvento(PluginCall call) {
-        // Extraer las variables 
-        // titulo: string, descripcion?: string, ubicacion?: string, todoElDia: boolean, unixInicio: number, unixFin: number
-        String titulo = call.getString("titulo");
-        String descripcion = call.getString("descripcion");
-        String ubicacion = call.getString("ubicacion");
-        Boolean todoElDia = call.getBoolean("todoElDia");
-        Long unixInicio = call.getLong("unixInicio");
-        Long unixFin = call.getLong("unixFin");
+		Intent intent = new Intent(Intent.ACTION_INSERT)
+			.setData(CalendarContract.Events.CONTENT_URI)
+			.putExtra(CalendarContract.Events.TITLE, titulo)
+			.putExtra(CalendarContract.Events.DESCRIPTION, descripcion)
+			.putExtra(CalendarContract.Events.EVENT_LOCATION, ubicacion)
+			.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, (unixInicio.longValue() * 1000))
+			.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, (unixFin.longValue() * 1000));
 
-        // Utilizar android Intent para insertar el evento en el calendario
-        Intent intent = new Intent(Intent.ACTION_INSERT)
-            .setData(CalendarContract.Events.CONTENT_URI)
-            .putExtra(CalendarContract.Events.TITLE, titulo)
-            .putExtra(CalendarContract.Events.DESCRIPTION, descripcion)
-            .putExtra(CalendarContract.Events.EVENT_LOCATION, ubicacion)
-            .putExtra(CalendarContract.Events.ALL_DAY, todoElDia);
+			// Mostrar intent en consola
+			Log.d("cE intent.toString()", intent.toString());
 
-        if (unixInicio != null) {
-            intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, unixInicio);
-        }
-        if (unixFin != null) {
-            intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, unixFin);
-        }
+		if (!timezone.isEmpty()) {
+			intent.putExtra(CalendarContract.Events.EVENT_TIMEZONE, timezone);
+		}
 
-        Boolean resultado = false;
-        if (getActivity() != null) {
-            getActivity().startActivity(intent);
-            resultado = true;
-        }
+		startActivityForResult(call, intent, 2);  // Usa cualquier número de código de solicitud que desees
+	}
 
-        // Retornar un JSObject con el resultado
-        JSObject ret = new JSObject();
-        ret.put("resultado", resultado);
-        call.resolve(ret);
-    }
+	// Método para manejar el resultado de la actividad (por ejemplo, cuando el usuario cierra la actividad de calendario)
+	@Override
+	protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
+				super.handleOnActivityResult(requestCode, resultCode, data);
+				// Mostrar data en consola
+				Log.d("hOAR data.toString()", data.toString());
+
+		if (resultCode == Activity.RESULT_OK && requestCode == 2) {  // Cambia esto por el código de solicitud que uses
+			Toast.makeText(getContext(), "Evento creado con éxito", Toast.LENGTH_SHORT).show();
+
+			// Puedes devolver información adicional a JavaScript si es necesario
+			JSObject ret = new JSObject();
+			ret.put("resultado", "creado");
+			notifyListeners("eventoCreado", ret);  // Puedes usar cualquier evento que hayas definido en tu JavaScript
+		} else if (resultCode == Activity.RESULT_CANCELED && requestCode == 2) {  // Cambia esto por el código de solicitud que uses
+			Toast.makeText(getContext(), "Usuario canceló la creación del evento", Toast.LENGTH_SHORT).show();
+
+			// Puedes devolver información adicional a JavaScript si es necesario
+			JSObject ret = new JSObject();
+			ret.put("resultado", "cancelado");
+			notifyListeners("creacionEventoCancelada", ret);  // Puedes usar cualquier evento que hayas definido en tu JavaScript
+		}
+	}
 }

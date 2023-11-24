@@ -1,6 +1,6 @@
 {
   "name": "capacitor-calendario",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Plugin para agregar eventos al calendario del sistema.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
