@@ -5,28 +5,38 @@ import type { CalendarioPlugin, Evento, Resultado } from './definitions';
 function crearICS(evento: Evento): string {
   // Formato de fecha y hora para el iCalendar
   function formatearFechaHora(fecha: Date) {
-    return fecha.toISOString().replace(/[:-]/g, '').split('.')[0] + 'Z';
+    return fecha.toISOString().replace(/[:-]/g, '').split('.')[0];
   }
 
-  const DTSTAMP = `TZID=${evento.timezone}:${formatearFechaHora(new Date())}`
-  const DTSTART = `TZID=${evento.timezone}:${formatearFechaHora(new Date(evento.unixInicio))}`
-  const DTEND = `TZID=${evento.timezone}:${formatearFechaHora(new Date(evento.unixFin))}`
+  const DTSTAMP = formatearFechaHora(new Date())
+  const DTSTART = formatearFechaHora(new Date(evento.unixInicio))
+  const DTEND = formatearFechaHora(new Date(evento.unixFin))
+  const descripcion = evento.descripcion || `${evento.titulo} ${evento.lugar ? '@' + evento.lugar : ''}`
+  const PRODID = `-//Boxmagic//${evento.organizadorNombre}//ES`
+  const organizadorNombre = evento.organizadorNombre
+  const organizadorEmail = evento.organizadorEmail
+  const UID = evento.eventoID
 
-  // Encabezado del archivo ICS
   let icsData = `BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-BEGIN:VEVENT`;
+PRODID:${PRODID}
+BEGIN:VEVENT
+UID:${UID}`;
 
   // Detalles del evento
-  icsData += `
-SUMMARY:${evento.titulo}
-DESCRIPTION:${evento.descripcion}
-LOCATION:${evento.ubicacion}
+  icsData += `SUMMARY:${evento.titulo}\n`
+  if (descripcion) {
+    icsData += `DESCRIPTION:${descripcion}\n`
+  }
+  if (organizadorNombre) {
+    icsData += `ORGANIZER:CN=${organizadorNombre};mailto:${organizadorEmail}\n`
+  }
+  
+  icsData += `LOCATION:${evento.direccion || evento.lugar || ''}
 DTSTAMP:${DTSTAMP}
 DTSTART:${DTSTART}
-DTEND:${DTEND}
-`;
+DTEND:${DTEND}\n`;
 
   // Si hay información sobre la zona horaria, agrégala
   if (evento.timezone) {

@@ -42,14 +42,18 @@ crearEvento(evento: Evento) => Promise<{ resultado: Resultado; }>
 
 #### Evento
 
-| Prop              | Type                |
-| ----------------- | ------------------- |
-| **`titulo`**      | <code>string</code> |
-| **`unixInicio`**  | <code>number</code> |
-| **`unixFin`**     | <code>number</code> |
-| **`timezone`**    | <code>string</code> |
-| **`ubicacion`**   | <code>string</code> |
-| **`descripcion`** | <code>string</code> |
+| Prop                    | Type                |
+| ----------------------- | ------------------- |
+| **`eventoID`**          | <code>string</code> |
+| **`titulo`**            | <code>string</code> |
+| **`unixInicio`**        | <code>number</code> |
+| **`unixFin`**           | <code>number</code> |
+| **`timezone`**          | <code>string</code> |
+| **`organizadorNombre`** | <code>string</code> |
+| **`organizadorEmail`**  | <code>string</code> |
+| **`lugar`**             | <code>string</code> |
+| **`direccion`**         | <code>string</code> |
+| **`descripcion`**       | <code>string</code> |
 
 
 ### Type Aliases

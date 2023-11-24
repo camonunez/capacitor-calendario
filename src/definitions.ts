@@ -4,11 +4,15 @@ export interface CalendarioPlugin {
 }
 
 export interface Evento {
+  eventoID: string;
   titulo: string;
   unixInicio: number;
   unixFin: number;
+  timezone: string;
 
-  timezone?: string;
-  ubicacion?: string;
+  organizadorNombre?: string;
+  organizadorEmail?: string;
+  lugar?: string;
+  direccion?: string;
   descripcion?: string;
 }
