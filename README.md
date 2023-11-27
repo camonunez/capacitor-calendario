@@ -54,6 +54,7 @@ crearEvento(evento: Evento) => Promise<{ resultado: Resultado; }>
 | **`lugar`**             | <code>string</code> |
 | **`direccion`**         | <code>string</code> |
 | **`descripcion`**       | <code>string</code> |
+| **`url`**               | <code>string</code> |
 
 
 ### Type Aliases

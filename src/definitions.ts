@@ -10,9 +10,11 @@ export interface Evento {
   unixFin: number;
   timezone: string;
 
+  // Opcionales
   organizadorNombre?: string;
   organizadorEmail?: string;
   lugar?: string;
   direccion?: string;
   descripcion?: string;
+  url?: string;
 }

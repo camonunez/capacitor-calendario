@@ -12,7 +12,7 @@ function crearICS(evento: Evento): string {
   const DTSTART = formatearFechaHora(new Date(evento.unixInicio))
   const DTEND = formatearFechaHora(new Date(evento.unixFin))
   const descripcion = evento.descripcion || `${evento.titulo} ${evento.lugar ? '@' + evento.lugar : ''}`
-  const PRODID = `-//Boxmagic//${evento.organizadorNombre}//ES`
+  const PRODID = `-//POW//Capacitor-Calendario//ES`
   const organizadorNombre = evento.organizadorNombre
   const organizadorEmail = evento.organizadorEmail
   const UID = evento.eventoID
@@ -22,7 +22,7 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:${PRODID}
 BEGIN:VEVENT
-UID:${UID}`;
+UID:${UID}\n`;
 
   // Detalles del evento
   icsData += `SUMMARY:${evento.titulo}\n`

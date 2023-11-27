@@ -2,11 +2,7 @@ package cl.pow.capacitor.calendario;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Build;
 import android.provider.CalendarContract;
-import android.util.Log;
-import android.widget.Toast;
-
 import androidx.activity.result.ActivityResult;
 
 import com.getcapacitor.JSObject;
@@ -17,74 +13,54 @@ import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 
-@CapacitorPlugin(
-	name = "Calendario",
-	permissions = {
-		@Permission(
-			strings = { "android.permission.READ_CALENDAR", "android.permission.WRITE_CALENDAR" },
-			alias = "calendar"
-		)
-	}
-)
+@CapacitorPlugin(name = "Calendario", permissions = {
+		@Permission(strings = { "android.permission.READ_CALENDAR",
+				"android.permission.WRITE_CALENDAR" }, alias = "calendar")
+})
 public class CalendarioPlugin extends Plugin {
 
 	@PluginMethod
 	public void crearEvento(PluginCall call) {
+		// Requeridos
+		String eventoID = call.getString("eventoID");
 		String titulo = call.getString("titulo");
-		String descripcion = call.getString("descripcion");
-
-		if (!call.getData().has("unixInicio")) {
-			call.reject("Se debe proveer unixInicio");
-			return;
-		}
-		if (!call.getData().has("unixFin")) {
-			call.reject("Se debe proveer unixFin");
-			return;
-		}
 		Integer unixInicio = call.getInt("unixInicio");
 		Integer unixFin = call.getInt("unixFin");
-
-		String lugar = call.getString("lugar");
-		String direccion = call.getString("direccion");
 		String timezone = call.getString("timezone", "");
 
-		Intent intent = new Intent(Intent.ACTION_INSERT)
-			.setData(CalendarContract.Events.CONTENT_URI)
-			.putExtra(CalendarContract.Events.TITLE, titulo)
-			.putExtra(CalendarContract.Events.DESCRIPTION, descripcion)
-			.putExtra(CalendarContract.Events.EVENT_LOCATION, lugar + " - " + direccion)
-			.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, (unixInicio.longValue() * 1000))
-			.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, (unixFin.longValue() * 1000));
+		// Opcionales
+		String lugar = call.getString("lugar", null);
+		String direccion = call.getString("direccion", null);
+		String descripcion = call.getString("descripcion", null);
+		String organizadorNombre = call.getString("organizadorNombre", null);
+		String organizadorEmail = call.getString("organizadorEmail", null);
+		String url = call.getString("url", null);
 
-		if (!timezone.isEmpty()) {
-			intent.putExtra(CalendarContract.Events.EVENT_TIMEZONE, timezone);
+		Intent intent = new Intent(Intent.ACTION_INSERT)
+				.setData(CalendarContract.Events.CONTENT_URI)
+				.putExtra(CalendarContract.Events.TITLE, titulo)
+				.putExtra(CalendarContract.Events.DESCRIPTION, descripcion)
+				.putExtra(CalendarContract.Events.EVENT_LOCATION, lugar + (direccion != null ? " - " + direccion : ""))
+				.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, (unixInicio.longValue() * 1000))
+				.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, (unixFin.longValue() * 1000))
+				.putExtra(CalendarContract.Events.EVENT_TIMEZONE, timezone);
+
+		// Add optional fields if they exist
+		if (organizadorEmail != null) {
+			intent.putExtra(CalendarContract.Events.ORGANIZER, organizadorEmail);
 		}
+		startActivityForResult(call, intent, "resultadoEventoEnCalendario");
 	}
 
-	// Método para manejar el resultado de la actividad (por ejemplo, cuando el usuario cierra la actividad de calendario)
 	@ActivityCallback
 	private void resultadoEventoEnCalendario(PluginCall call, ActivityResult result) {
-
 		JSObject ret = new JSObject();
-
-		// Si el resultCode es igual a Activity.RESULT_CANCELED, entonces el usuario canceló la creación del evento
+		getActivity();
 		if (result.getResultCode() == Activity.RESULT_CANCELED) {
-			Toast.makeText(getContext(), "Usuario canceló la creación del evento", Toast.LENGTH_SHORT).show();
-
-			// Puedes devolver información adicional a JavaScript si es necesario
 			ret.put("resultado", "cancelado");
-			notifyListeners("creacionEventoCancelada", ret); // Puedes usar cualquier evento que hayas definido en tu JavaScript
-		}
-
-		// Si el resultCode es igual a Activity.RESULT_OK, entonces el usuario creó el evento
-		if (result.getResultCode() == Activity.RESULT_OK) {
-			Toast.makeText(getContext(), "Evento creado con éxito", Toast.LENGTH_SHORT).show();
-
-			// Puedes devolver información adicional a JavaScript si es necesario
+		} else if (result.getResultCode() == Activity.RESULT_OK) {
 			ret.put("resultado", "creado");
-			notifyListeners("eventoCreado", ret); // Puedes usar cualquier evento que hayas definido en tu JavaScript
 		}
-
 		call.resolve(ret);
 	}
 }
