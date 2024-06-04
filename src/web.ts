@@ -40,7 +40,7 @@ DTEND:${DTEND}\n`;
 
   // Si hay información sobre la zona horaria, agrégala
   if (evento.timezone) {
-    icsData += `TZID=${evento.timezone}\n`;
+    icsData += `TZID:${evento.timezone}\n`;
   }
 
   // Fin del evento y del archivo ICS
