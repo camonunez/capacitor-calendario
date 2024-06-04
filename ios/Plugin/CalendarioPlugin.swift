@@ -9,7 +9,7 @@ public class CalendarioPlugin: CAPPlugin, EKEventEditViewDelegate {
 
     @objc func crearEvento(_ call: CAPPluginCall) {
         self.currentCall = call
-        
+
         DispatchQueue.main.async {
             // Obtener los parámetros
             let eventoID = call.getString("eventoID") ?? ""
@@ -22,7 +22,7 @@ public class CalendarioPlugin: CAPPlugin, EKEventEditViewDelegate {
             let direccion = call.getString("direccion")
             let timezone = call.getString("timezone")
             let urlString = call.getString("url")
-            
+
             let eventStore = EKEventStore()
             let evento = EKEvent(eventStore: eventStore)
             evento.calendar = eventStore.defaultCalendarForNewEvents
@@ -37,16 +37,15 @@ public class CalendarioPlugin: CAPPlugin, EKEventEditViewDelegate {
             if let descripcion = descripcion {
                 evento.notes = descripcion
             }
-            
+
             if let urlString = urlString, let url = URL(string: urlString) {
                 evento.url = url
             }
-            
+
             if let lugar = lugar, let direccion = direccion {
                 evento.location = direccion
                 evento.structuredLocation = EKStructuredLocation(title: lugar)
             }
-            
 
             // Preparar un controlador de vista
             let eventEditViewController = EKEventEditViewController()
@@ -65,7 +64,7 @@ public class CalendarioPlugin: CAPPlugin, EKEventEditViewDelegate {
         DispatchQueue.main.async {
             controller.dismiss(animated: true, completion: nil)
         }
-        
+
         // Manejar el resultado (el usuario creó o canceló el evento?)
         if action == .saved {
             self.currentCall?.resolve(["resultado": "creado"])

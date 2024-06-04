@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.provider.CalendarContract;
 import androidx.activity.result.ActivityResult;
-
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -13,54 +12,54 @@ import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 
-@CapacitorPlugin(name = "Calendario", permissions = {
-		@Permission(strings = { "android.permission.READ_CALENDAR",
-				"android.permission.WRITE_CALENDAR" }, alias = "calendar")
-})
+@CapacitorPlugin(
+    name = "Calendario",
+    permissions = { @Permission(strings = { "android.permission.READ_CALENDAR", "android.permission.WRITE_CALENDAR" }, alias = "calendar") }
+)
 public class CalendarioPlugin extends Plugin {
 
-	@PluginMethod
-	public void crearEvento(PluginCall call) {
-		// Requeridos
-		String eventoID = call.getString("eventoID");
-		String titulo = call.getString("titulo");
-		Integer unixInicio = call.getInt("unixInicio");
-		Integer unixFin = call.getInt("unixFin");
-		String timezone = call.getString("timezone", "");
+    @PluginMethod
+    public void crearEvento(PluginCall call) {
+        // Requeridos
+        String eventoID = call.getString("eventoID");
+        String titulo = call.getString("titulo");
+        Integer unixInicio = call.getInt("unixInicio");
+        Integer unixFin = call.getInt("unixFin");
+        String timezone = call.getString("timezone", "");
 
-		// Opcionales
-		String lugar = call.getString("lugar", null);
-		String direccion = call.getString("direccion", null);
-		String descripcion = call.getString("descripcion", null);
-		String organizadorNombre = call.getString("organizadorNombre", null);
-		String organizadorEmail = call.getString("organizadorEmail", null);
-		String url = call.getString("url", null);
+        // Opcionales
+        String lugar = call.getString("lugar", null);
+        String direccion = call.getString("direccion", null);
+        String descripcion = call.getString("descripcion", null);
+        String organizadorNombre = call.getString("organizadorNombre", null);
+        String organizadorEmail = call.getString("organizadorEmail", null);
+        String url = call.getString("url", null);
 
-		Intent intent = new Intent(Intent.ACTION_INSERT)
-				.setData(CalendarContract.Events.CONTENT_URI)
-				.putExtra(CalendarContract.Events.TITLE, titulo)
-				.putExtra(CalendarContract.Events.DESCRIPTION, descripcion)
-				.putExtra(CalendarContract.Events.EVENT_LOCATION, lugar + (direccion != null ? " - " + direccion : ""))
-				.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, (unixInicio.longValue() * 1000))
-				.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, (unixFin.longValue() * 1000))
-				.putExtra(CalendarContract.Events.EVENT_TIMEZONE, timezone);
+        Intent intent = new Intent(Intent.ACTION_INSERT)
+            .setData(CalendarContract.Events.CONTENT_URI)
+            .putExtra(CalendarContract.Events.TITLE, titulo)
+            .putExtra(CalendarContract.Events.DESCRIPTION, descripcion)
+            .putExtra(CalendarContract.Events.EVENT_LOCATION, lugar + (direccion != null ? " - " + direccion : ""))
+            .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, (unixInicio.longValue() * 1000))
+            .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, (unixFin.longValue() * 1000))
+            .putExtra(CalendarContract.Events.EVENT_TIMEZONE, timezone);
 
-		// Add optional fields if they exist
-		if (organizadorEmail != null) {
-			intent.putExtra(CalendarContract.Events.ORGANIZER, organizadorEmail);
-		}
-		startActivityForResult(call, intent, "resultadoEventoEnCalendario");
-	}
+        // Add optional fields if they exist
+        if (organizadorEmail != null) {
+            intent.putExtra(CalendarContract.Events.ORGANIZER, organizadorEmail);
+        }
+        startActivityForResult(call, intent, "resultadoEventoEnCalendario");
+    }
 
-	@ActivityCallback
-	private void resultadoEventoEnCalendario(PluginCall call, ActivityResult result) {
-		JSObject ret = new JSObject();
-		getActivity();
-		if (result.getResultCode() == Activity.RESULT_CANCELED) {
-			ret.put("resultado", "cancelado");
-		} else if (result.getResultCode() == Activity.RESULT_OK) {
-			ret.put("resultado", "creado");
-		}
-		call.resolve(ret);
-	}
+    @ActivityCallback
+    private void resultadoEventoEnCalendario(PluginCall call, ActivityResult result) {
+        JSObject ret = new JSObject();
+        getActivity();
+        if (result.getResultCode() == Activity.RESULT_CANCELED) {
+            ret.put("resultado", "cancelado");
+        } else if (result.getResultCode() == Activity.RESULT_OK) {
+            ret.put("resultado", "creado");
+        }
+        call.resolve(ret);
+    }
 }
