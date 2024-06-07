@@ -6,8 +6,10 @@ export interface CalendarioPlugin {
 export interface Evento {
 	eventoID: string;
 	titulo: string;
-	unixInicio: number;
-	unixFin: number;
+
+	// mse: milisegundos desde el 1 de enero de 1970
+	mseInicio: number;
+	mseFin: number;
 	timezone: string;
 
 	// Opcionales

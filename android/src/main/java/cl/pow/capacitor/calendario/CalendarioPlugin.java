@@ -23,8 +23,8 @@ public class CalendarioPlugin extends Plugin {
         // Requeridos
         String eventoID = call.getString("eventoID");
         String titulo = call.getString("titulo");
-        Integer unixInicio = call.getInt("unixInicio");
-        Integer unixFin = call.getInt("unixFin");
+        Integer mseInicio = call.getInt("mseInicio");
+        Integer mseFin = call.getInt("mseFin");
         String timezone = call.getString("timezone", "");
 
         // Opcionales
@@ -40,8 +40,8 @@ public class CalendarioPlugin extends Plugin {
             .putExtra(CalendarContract.Events.TITLE, titulo)
             .putExtra(CalendarContract.Events.DESCRIPTION, descripcion)
             .putExtra(CalendarContract.Events.EVENT_LOCATION, lugar + (direccion != null ? " - " + direccion : ""))
-            .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, (unixInicio.longValue() * 1000))
-            .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, (unixFin.longValue() * 1000))
+            .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, (mseInicio.longValue()))
+            .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, (mseFin.longValue()))
             .putExtra(CalendarContract.Events.EVENT_TIMEZONE, timezone);
 
         // Add optional fields if they exist

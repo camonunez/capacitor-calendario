@@ -9,8 +9,8 @@ function crearICS(evento: Evento): string {
 	}
 
 	const DTSTAMP = formatearFechaHora(new Date());
-	const DTSTART = formatearFechaHora(new Date(evento.unixInicio));
-	const DTEND = formatearFechaHora(new Date(evento.unixFin));
+	const DTSTART = formatearFechaHora(new Date(evento.mseInicio));
+	const DTEND = formatearFechaHora(new Date(evento.mseFin));
 	const descripcion =
 		evento.descripcion ||
 		`${evento.titulo} ${evento.lugar ? '@' + evento.lugar : ''}`;
@@ -35,19 +35,21 @@ UID:${UID}\n`;
 		icsData += `ORGANIZER:CN=${organizadorNombre};mailto:${organizadorEmail}\n`;
 	}
 
-	icsData += `LOCATION:${evento.direccion || evento.lugar || ''}
-DTSTAMP:${DTSTAMP}
-DTSTART:${DTSTART}
-DTEND:${DTEND}\n`;
+	icsData += `LOCATION:${evento.direccion || evento.lugar || ''}`
 
 	// Si hay información sobre la zona horaria, agrégala
 	if (evento.timezone) {
+		const parteTZ = `TZID=${evento.timezone}`;
+
+		icsData += `DTSTAMP;${parteTZ}:${DTSTAMP}\n`;
+		icsData += `DTSTART;${parteTZ}:${DTSTART}\n`;
+		icsData += `DTEND;${parteTZ}:${DTEND}\n`;
 		icsData += `TZID:${evento.timezone}\n`;
 	}
 
 	// Fin del evento y del archivo ICS
-	icsData += `END:VEVENT
-END:VCALENDAR`;
+	icsData += `END:VEVENT\n`;
+	icsData += `END:VCALENDAR\n`;
 
 	return icsData;
 }

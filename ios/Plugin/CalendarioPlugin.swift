@@ -14,8 +14,8 @@ public class CalendarioPlugin: CAPPlugin, EKEventEditViewDelegate {
             // Obtener los parámetros
             let eventoID = call.getString("eventoID") ?? ""
             let titulo = call.getString("titulo") ?? ""
-            let unixInicio = call.getDouble("unixInicio") ?? 0
-            let unixFin = call.getDouble("unixFin") ?? 0
+            let mseInicio = call.getDouble("mseInicio") ?? 0
+            let mseFin = call.getDouble("mseFin") ?? 0
 
             let descripcion = call.getString("descripcion")
             let lugar = call.getString("lugar")
@@ -29,8 +29,8 @@ public class CalendarioPlugin: CAPPlugin, EKEventEditViewDelegate {
 
             // Requeridos
             evento.title = titulo
-            evento.startDate = Date(timeIntervalSince1970: unixInicio)
-            evento.endDate = Date(timeIntervalSince1970: unixFin)
+            evento.startDate = Date(timeIntervalSince1970: mseInicio / 1000)
+            evento.endDate = Date(timeIntervalSince1970: mseFin / 1000)
             evento.timeZone = TimeZone(identifier: timezone ?? "")
 
             // Opcionales

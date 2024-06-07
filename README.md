@@ -46,8 +46,8 @@ crearEvento(evento: Evento) => Promise<{ resultado: Resultado; }>
 | ----------------------- | ------------------- |
 | **`eventoID`**          | <code>string</code> |
 | **`titulo`**            | <code>string</code> |
-| **`unixInicio`**        | <code>number</code> |
-| **`unixFin`**           | <code>number</code> |
+| **`mseInicio`**         | <code>number</code> |
+| **`mseFin`**            | <code>number</code> |
 | **`timezone`**          | <code>string</code> |
 | **`organizadorNombre`** | <code>string</code> |
 | **`organizadorEmail`**  | <code>string</code> |
