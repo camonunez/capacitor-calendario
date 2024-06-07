@@ -1,6 +1,6 @@
 {
   "name": "capacitor-calendario",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "Plugin para agregar eventos al calendario del sistema.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -41,7 +41,8 @@
     "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.js",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "publicar": "npm publish"
   },
   "devDependencies": {
     "@capacitor/android": "^6.0.0",

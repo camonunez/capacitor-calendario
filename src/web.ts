@@ -35,7 +35,7 @@ UID:${UID}\n`;
 		icsData += `ORGANIZER:CN=${organizadorNombre};mailto:${organizadorEmail}\n`;
 	}
 
-	icsData += `LOCATION:${evento.direccion || evento.lugar || ''}`
+	icsData += `LOCATION:${evento.direccion || evento.lugar || ''}\n`
 
 	// Si hay información sobre la zona horaria, agrégala
 	if (evento.timezone) {
