@@ -1,6 +1,6 @@
 {
   "name": "capacitor-calendario",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "Plugin para agregar eventos al calendario del sistema.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -56,7 +56,7 @@
     "prettier": "~3.3.1",
     "prettier-plugin-java": "~2.6.0",
     "rimraf": "^3.0.2",
-    "rollup": "^4.18.0",
+    "rollup": "^2.32.0",
     "swiftlint": "^1.0.2",
     "typescript": "^5.4.5"
   },
