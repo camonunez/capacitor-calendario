@@ -1,6 +1,7 @@
 package cl.pow.capacitor.calendario;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.provider.CalendarContract;
 import androidx.activity.result.ActivityResult;
@@ -20,46 +21,75 @@ public class CalendarioPlugin extends Plugin {
 
     @PluginMethod
     public void crearEvento(PluginCall call) {
-        // Requeridos
-        String eventoID = call.getString("eventoID");
-        String titulo = call.getString("titulo");
-        Integer mseInicio = call.getInt("mseInicio");
-        Integer mseFin = call.getInt("mseFin");
-        String timezone = call.getString("timezone", "");
+        // Obtener el objeto completo con todas las propiedades del evento
+        JSObject data = call.getObject("data");
 
-        // Opcionales
-        String lugar = call.getString("lugar", null);
-        String direccion = call.getString("direccion", null);
-        String descripcion = call.getString("descripcion", null);
-        String organizadorNombre = call.getString("organizadorNombre", null);
-        String organizadorEmail = call.getString("organizadorEmail", null);
-        String url = call.getString("url", null);
+        // Validar que los datos esenciales estén presentes
+        if (!data.has("mseInicio") || !data.has("mseFin")) {
+            call.reject("Faltan parámetros esenciales como 'mseInicio' o 'mseFin'.");
+            return;
+        }
 
+        // Crear la intención para insertar un evento en el calendario
         Intent intent = new Intent(Intent.ACTION_INSERT)
-            .setData(CalendarContract.Events.CONTENT_URI)
-            .putExtra(CalendarContract.Events.TITLE, titulo)
-            .putExtra(CalendarContract.Events.DESCRIPTION, descripcion)
-            .putExtra(CalendarContract.Events.EVENT_LOCATION, lugar + (direccion != null ? " - " + direccion : ""))
+            .setData(CalendarContract.Events.CONTENT_URI);
 
-			.putExtra(CalendarContract.Events.DTSTART, mseInicio)
-			.putExtra(CalendarContract.Events.DTEND, mseFin)
-			.putExtra(CalendarContract.Events.EVENT_TIMEZONE, timezone)
+        // Llenar la intención con las propiedades que el usuario proporciona
+        ContentValues values = new ContentValues();
 
-            .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, mseInicio)
-            .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, mseFin);
+        // Iterar sobre todas las propiedades del objeto `data`
+        for (String key : data.keys()) {
+            // Verificar si la clave está presente en CalendarContract.Events
+            switch (key) {
+                case "titulo":
+                    values.put(CalendarContract.Events.TITLE, data.getString(key));
+                    break;
+                case "descripcion":
+                    values.put(CalendarContract.Events.DESCRIPTION, data.getString(key));
+                    break;
+                case "lugar":
+                    values.put(CalendarContract.Events.EVENT_LOCATION, data.getString(key));
+                    break;
+                case "direccion":
+                    // Si hay una dirección, concatenar con el lugar
+                    if (data.has("lugar")) {
+                        values.put(CalendarContract.Events.EVENT_LOCATION, data.getString("lugar") + " - " + data.getString("direccion"));
+                    } else {
+                        values.put(CalendarContract.Events.EVENT_LOCATION, data.getString("direccion"));
+                    }
+                    break;
+                case "timezone":
+                    values.put(CalendarContract.Events.EVENT_TIMEZONE, data.getString(key));
+                    break;
+                case "mseInicio":
+                    values.put(CalendarContract.Events.DTSTART, data.getInt(key));
+                    break;
+                case "mseFin":
+                    values.put(CalendarContract.Events.DTEND, data.getInt(key));
+                    break;
+                case "organizadorEmail":
+                    values.put(CalendarContract.Events.ORGANIZER, data.getString(key));
+                    break;
+                case "url":
+                    values.put(CalendarContract.Events.EVENT_URL, data.getString(key));
+                    break;
+                default:
+                    // Agregar otras propiedades que CalendarContract pueda soportar en el futuro
+                    // Aquí no se debe hacer nada, ya que los datos específicos del CalendarContract se procesan arriba.
+                    break;
+            }
+        }
 
-        // Add optional fields if they exist
-        if (organizadorEmail != null) {
-            intent.putExtra(CalendarContract.Events.ORGANIZER, organizadorEmail);
-        };
+        // Añadir los valores a la intención
+        intent.putExtras(values);
 
+        // Ejecutar la actividad
         startActivityForResult(call, intent, "resultadoEventoEnCalendario");
     }
 
     @ActivityCallback
     private void resultadoEventoEnCalendario(PluginCall call, ActivityResult result) {
         JSObject ret = new JSObject();
-        getActivity();
         if (result.getResultCode() == Activity.RESULT_CANCELED) {
             ret.put("resultado", "cancelado");
         } else if (result.getResultCode() == Activity.RESULT_OK) {
