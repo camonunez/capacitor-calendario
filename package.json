@@ -1,6 +1,6 @@
 {
 	"name": "capacitor-calendario",
-	"version": "0.1.21",
+	"version": "0.2.0",
 	"description": "Plugin para agregar eventos al calendario del sistema.",
 	"main": "dist/plugin.cjs.js",
 	"module": "dist/esm/index.js",
@@ -30,7 +30,7 @@
 	"scripts": {
 		"verify": "npm run verify:ios && npm run verify:android && npm run verify:web",
 		"verify:ios": "cd ios && pod install && xcodebuild -workspace Plugin.xcworkspace -scheme Plugin -destination generic/platform=iOS && cd ..",
-		"verify:android": "cd android && ./gradlew clean build test && cd ..",
+		"verify:android": "cd android && ./gradlew clean build test --scan --stacktrace && cd ..",
 		"verify:web": "npm run build",
 		"lint": "npm run eslint && npm run prettier -- --check && npm run swiftlint -- lint",
 		"fmt": "npm run eslint -- --fix && npm run prettier -- --write && npm run swiftlint -- --fix --format",

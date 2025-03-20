@@ -1,9 +1,10 @@
 package cl.pow.capacitor.calendario;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Intent;
+import android.os.Bundle;
 import android.provider.CalendarContract;
+import android.util.Log;
 import androidx.activity.result.ActivityResult;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -19,65 +20,72 @@ import com.getcapacitor.annotation.Permission;
 )
 public class CalendarioPlugin extends Plugin {
 
+    private static final String TAG = "CalendarioPlugin";
+
     @PluginMethod
     public void crearEvento(PluginCall call) {
-        // Obtener el objeto con todas las propiedades del evento
-        JSObject data = call.getObject("data");
+        // Requeridos
+        String eventoID = call.getString("eventoID");
+        String titulo = call.getString("titulo");
+		Long mseInicio = call.getLong("mseInicio");
+		Long mseFin = call.getLong("mseFin");
+        String timezone = call.getString("timezone", "");
 
-        // Validar que los parámetros esenciales estén presentes
-        if (!data.has("mseInicio") || !data.has("mseFin")) {
-            call.reject("Faltan parámetros esenciales como 'mseInicio' o 'mseFin'.");
+        // Opcionales
+        String lugar = call.getString("lugar", null);
+        String direccion = call.getString("direccion", null);
+        String descripcion = call.getString("descripcion", null);
+        String organizadorNombre = call.getString("organizadorNombre", null);
+        String organizadorEmail = call.getString("organizadorEmail", null);
+        String url = call.getString("url", null);
+
+        // Registro de datos recibidos
+        Log.d(TAG, "Crear evento:");
+        Log.d(TAG, "  eventoID: " + eventoID);
+        Log.d(TAG, "  titulo: " + titulo);
+        Log.d(TAG, "  mseInicio: " + mseInicio);
+        Log.d(TAG, "  mseFin: " + mseFin);
+        Log.d(TAG, "  timezone: " + timezone);
+        Log.d(TAG, "  lugar: " + lugar);
+        Log.d(TAG, "  direccion: " + direccion);
+        Log.d(TAG, "  descripcion: " + descripcion);
+        Log.d(TAG, "  organizadorNombre: " + organizadorNombre);
+        Log.d(TAG, "  organizadorEmail: " + organizadorEmail);
+        Log.d(TAG, "  url: " + url);
+
+        if (titulo == null || titulo.isEmpty() || mseInicio == null || mseFin == null) {
+            call.reject("Parámetros obligatorios faltantes.");
             return;
         }
 
-        // Crear la intención para insertar un evento en el calendario
-        Intent intent = new Intent(Intent.ACTION_INSERT)
-            .setData(CalendarContract.Events.CONTENT_URI);
-
-        // Llenar la intención con las propiedades que el usuario proporciona
-        ContentValues values = new ContentValues();
-
-        // Asignar los campos del evento de CalendarContract
-        if (data.has("titulo")) {
-            values.put(CalendarContract.Events.TITLE, data.getString("titulo"));
-        }
-        if (data.has("descripcion")) {
-            values.put(CalendarContract.Events.DESCRIPTION, data.getString("descripcion"));
-        }
-        if (data.has("lugar")) {
-            values.put(CalendarContract.Events.EVENT_LOCATION, data.getString("lugar"));
-        }
-        if (data.has("direccion")) {
-            // Concatenar lugar y direccion si ambos existen
-            String lugarDireccion = data.has("lugar") 
-                ? data.getString("lugar") + " - " + data.getString("direccion")
-                : data.getString("direccion");
-            values.put(CalendarContract.Events.EVENT_LOCATION, lugarDireccion);
-        }
-        if (data.has("timezone")) {
-            values.put(CalendarContract.Events.EVENT_TIMEZONE, data.getString("timezone"));
-        }
-        if (data.has("mseInicio")) {
-            values.put(CalendarContract.Events.DTSTART, data.getInt("mseInicio"));
-        }
-        if (data.has("mseFin")) {
-            values.put(CalendarContract.Events.DTEND, data.getInt("mseFin"));
-        }
-        if (data.has("organizadorEmail")) {
-            values.put(CalendarContract.Events.ORGANIZER, data.getString("organizadorEmail"));
-        }
-        if (data.has("url")) {
-            values.put(CalendarContract.Events.EVENT_URL, data.getString("url"));
+        if (mseFin <= mseInicio) {
+            call.reject("La hora de finalización debe ser posterior a la hora de inicio.");
+            return;
         }
 
-        // Agregar cualquier otro campo desconocido para CalendarContract.Events
-        // Esto permite que el plugin sea extensible si Android soporta más campos en el futuro
+        try {
+            Intent intent = new Intent(Intent.ACTION_INSERT)
+                .setData(CalendarContract.Events.CONTENT_URI)
+                .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, mseInicio)
+                .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, mseFin)
+                .putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, false)
+                .putExtra(CalendarContract.Events.TITLE, titulo)
+                .putExtra(CalendarContract.Events.DESCRIPTION, descripcion);
 
-        // Añadir los valores a la intención
-        intent.putExtras(values);
+            String location = lugar;
+            if (direccion != null && !direccion.isEmpty()) {
+                location += (lugar != null && !lugar.isEmpty() ? " - " : "") + direccion;
+            }
+            intent.putExtra(CalendarContract.Events.EVENT_LOCATION, location);
 
-        // Ejecutar la actividad
-        startActivityForResult(call, intent, "resultadoEventoEnCalendario");
+            if (organizadorEmail != null) {
+                intent.putExtra(CalendarContract.Events.ORGANIZER, organizadorEmail);
+            }
+
+            startActivityForResult(call, intent, "resultadoEventoEnCalendario");
+        } catch (Exception e) {
+            call.reject("Error al crear el evento: " + e.getMessage());
+        }
     }
 
     @ActivityCallback
