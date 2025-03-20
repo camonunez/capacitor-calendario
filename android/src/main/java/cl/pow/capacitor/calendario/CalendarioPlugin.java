@@ -40,14 +40,19 @@ public class CalendarioPlugin extends Plugin {
             .putExtra(CalendarContract.Events.TITLE, titulo)
             .putExtra(CalendarContract.Events.DESCRIPTION, descripcion)
             .putExtra(CalendarContract.Events.EVENT_LOCATION, lugar + (direccion != null ? " - " + direccion : ""))
-            .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, (mseInicio.longValue()))
-            .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, (mseFin.longValue()))
-            .putExtra(CalendarContract.Events.EVENT_TIMEZONE, timezone);
+
+			.putExtra(CalendarContract.Events.DTSTART, mseInicio)
+			.putExtra(CalendarContract.Events.DTEND, mseFin)
+			.putExtra(CalendarContract.Events.EVENT_TIMEZONE, timezone)
+
+            .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, mseInicio)
+            .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, mseFin);
 
         // Add optional fields if they exist
         if (organizadorEmail != null) {
             intent.putExtra(CalendarContract.Events.ORGANIZER, organizadorEmail);
-        }
+        };
+
         startActivityForResult(call, intent, "resultadoEventoEnCalendario");
     }
 
